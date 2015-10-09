@@ -84,13 +84,16 @@ public class GiraphRunner implements Tool {
 /*if[PURE_YARN]
     GiraphYarnClient job = new GiraphYarnClient(giraphConf, jobName);
 else[PURE_YARN]*/
+    if (LOG.isInfoEnabled()) {
+        LOG.info("MUNTASIR: Giraph entry point ...");
+    }
     GiraphJob job = new GiraphJob(giraphConf, jobName);
     prepareHadoopMRJob(job, cmd);
 /*end[PURE_YARN]*/
-    System.out.println("MUNTASIR: Giraph entry point ...");
+    //System.out.println("MUNTASIR: Giraph entry point ...");
     if (LOG.isInfoEnabled()) {
         LOG.info("MUNTASIR: Giraph entry point ...");
-      }
+    }
     
     // run the job, collect results
     if (LOG.isDebugEnabled()) {
