@@ -46,7 +46,7 @@ public class GiraphRunner implements Tool {
   }
 
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(GiraphRunner.class);
+  private static final java.util.logging.Logger LOG = Logger.getLogger(GiraphRunner.class);
   /** Writable conf */
   private Configuration conf;
 
@@ -86,6 +86,7 @@ else[PURE_YARN]*/
     prepareHadoopMRJob(job, cmd);
 /*end[PURE_YARN]*/
     System.out.println("MUNTASIR: Giraph entry point ...");
+    LOG.info("MUNTASIR: Giraph entry point ...");
     // run the job, collect results
     if (LOG.isDebugEnabled()) {
       LOG.debug("Attempting to run Vertex: " + vertexClassName);
