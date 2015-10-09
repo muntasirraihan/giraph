@@ -46,7 +46,9 @@ public class GiraphRunner implements Tool {
   }
 
   /** Class logger */
-  private static final java.util.logging.Logger LOG = Logger.getLogger(GiraphRunner.class);
+  //private static final java.util.logging.Logger LOG = Logger.getLogger(GiraphRunner.class);
+  private static final Logger LOG = Logger.getLogger(GiraphRunner.class);
+  
   /** Writable conf */
   private Configuration conf;
 
