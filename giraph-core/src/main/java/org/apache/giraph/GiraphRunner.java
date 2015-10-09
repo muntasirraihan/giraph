@@ -85,7 +85,7 @@ else[PURE_YARN]*/
     GiraphJob job = new GiraphJob(giraphConf, jobName);
     prepareHadoopMRJob(job, cmd);
 /*end[PURE_YARN]*/
-
+    System.out.println("MUNTASIR: Giraph entry point ...");
     // run the job, collect results
     if (LOG.isDebugEnabled()) {
       LOG.debug("Attempting to run Vertex: " + vertexClassName);
