@@ -187,7 +187,9 @@ public class BspServiceMaster<I extends WritableComparable,
   private final int localityLimit = 5;
   /** Observers over master lifecycle. */
   private final MasterObserver[] observers;
-
+  
+  private static final Logger LOG = Logger.getLogger(BSPServiceMaster.class);
+  
   // Per-Superstep Metrics
   /** MasterCompute time */
   private GiraphTimer masterComputeTimer;
