@@ -141,7 +141,7 @@ public class BspServiceMaster<I extends WritableComparable,
   /** Time instance to use for timing */
   private static final Time TIME = SystemTime.get();
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(BspServiceMaster.class);
+  private static final java.util.logging.Logger LOG = Logger.getLogger(BspServiceMaster.class);
   /** Am I the master? */
   private boolean isMaster = false;
   /** Max number of workers */
@@ -1144,8 +1144,8 @@ public class BspServiceMaster<I extends WritableComparable,
    * checkpoint file.
    */
   private void assignPartitionOwners() {
-	throw new Exception("Muntasir Tracing calls");
-	
+	//throw new Exception("Muntasir Tracing calls");
+	LOG.info("Muntasir: inside assignPartitionOwners @ BSPServiceMaster");
     Collection<PartitionOwner> partitionOwners;
     if (getSuperstep() == INPUT_SUPERSTEP) {
       partitionOwners =
