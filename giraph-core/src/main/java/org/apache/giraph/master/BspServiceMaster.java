@@ -115,6 +115,8 @@ import org.apache.zookeeper.ZooDefs.Ids;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+//import org.apache.log4j.Logger;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -141,7 +143,9 @@ public class BspServiceMaster<I extends WritableComparable,
   /** Time instance to use for timing */
   private static final Time TIME = SystemTime.get();
   /** Class logger */
-  private static final java.util.logging.Logger LOG = Logger.getLogger(BspServiceMaster.class);
+  //private static final java.util.logging.Logger LOG = Logger.getLogger(BspServiceMaster.class);
+  private static final Logger LOG = Logger.getLogger(BSPServiceMaster.class);
+  
   /** Am I the master? */
   private boolean isMaster = false;
   /** Max number of workers */
@@ -188,7 +192,6 @@ public class BspServiceMaster<I extends WritableComparable,
   /** Observers over master lifecycle. */
   private final MasterObserver[] observers;
   
-  private static final Logger LOG = Logger.getLogger(BSPServiceMaster.class);
   
   // Per-Superstep Metrics
   /** MasterCompute time */
