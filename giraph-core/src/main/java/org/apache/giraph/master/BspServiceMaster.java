@@ -1641,7 +1641,7 @@ public class BspServiceMaster<I extends WritableComparable,
 
     GiraphStats.getInstance().
         getCurrentWorkers().setValue(chosenWorkerInfoList.size());
-    LOG.info("Muntasir: before calling assignPartitionOwners");
+    //LOG.info("Muntasir: before calling assignPartitionOwners");
     assignPartitionOwners();
 
     // Finalize the valid checkpoint file prefixes and possibly
