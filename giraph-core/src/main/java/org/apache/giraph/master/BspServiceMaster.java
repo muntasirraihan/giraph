@@ -1145,10 +1145,7 @@ public class BspServiceMaster<I extends WritableComparable,
    */
   private void assignPartitionOwners() {
 	throw new Exception("Muntasir Tracing calls");
-	try {}
-	catch (Exception e) {
-		e.printStackTrace();
-	}
+	
     Collection<PartitionOwner> partitionOwners;
     if (getSuperstep() == INPUT_SUPERSTEP) {
       partitionOwners =

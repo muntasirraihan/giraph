@@ -130,6 +130,10 @@ else[PURE_YARN]*/
    * @throws Exception Any exceptions thrown.
    */
   public static void main(String[] args) throws Exception {
-    System.exit(ToolRunner.run(new GiraphRunner(), args));
+	try {  
+		System.exit(ToolRunner.run(new GiraphRunner(), args));
+	}catch(Exception e) {
+		e.printStackTrace();	
+	}	
   }
 }
