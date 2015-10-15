@@ -1144,6 +1144,7 @@ public class BspServiceMaster<I extends WritableComparable,
    * checkpoint file.
    */
   private void assignPartitionOwners() {
+	throw new Exception("Muntasir Tracing calls");  
     Collection<PartitionOwner> partitionOwners;
     if (getSuperstep() == INPUT_SUPERSTEP) {
       partitionOwners =
