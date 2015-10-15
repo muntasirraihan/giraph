@@ -144,7 +144,7 @@ public class BspServiceMaster<I extends WritableComparable,
   private static final Time TIME = SystemTime.get();
   /** Class logger */
   //private static final java.util.logging.Logger LOG = Logger.getLogger(BspServiceMaster.class);
-  private static final Logger LOG = Logger.getLogger(BSPServiceMaster.class);
+  private static final Logger LOG = Logger.getLogger(BspServiceMaster.class);
   
   /** Am I the master? */
   private boolean isMaster = false;
