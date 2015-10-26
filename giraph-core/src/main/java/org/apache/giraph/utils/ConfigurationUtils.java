@@ -99,6 +99,7 @@ public final class ConfigurationUtils {
     OPTIONS.addOption("pc", "partitionClass", true, "Partition class");
     OPTIONS.addOption("vvf", "vertexValueFactoryClass", true,
         "Vertex value factory class");
+    OPTIONS.addOption("dl", "deadline", true, "Unix Deadline for the job.");
     OPTIONS.addOption("ca", "customArguments", true, "provide custom" +
         " arguments for the job configuration in the form:" +
         " -ca <param1>=<value1>,<param2>=<value2> -ca <param3>=<value3> etc." +
@@ -212,6 +213,9 @@ public final class ConfigurationUtils {
     if (cmd.hasOption("c")) {
       giraphConfiguration.setCombinerClass(
           (Class<? extends Combiner>) Class.forName(cmd.getOptionValue("c")));
+    }
+    if (cmd.hasOption("dl")) {
+      giraphConfiguration.setJobDeadline(Long.parseLong(cmd.getOptionValue("dl")));
     }
     if (cmd.hasOption("ve")) {
       giraphConfiguration.setVertexEdgesClass(

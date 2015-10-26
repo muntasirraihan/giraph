@@ -75,7 +75,7 @@ public class GiraphRunner implements Tool {
     if (null == cmd) {
       return 0; // user requested help/info printout, don't run a job.
     }
-
+    LOG.info("Job with deadline: " + giraphConf.getJobDeadline());
     // set up job for various platforms
     final String vertexClassName = args[0];
     final String jobName = "Giraph: " + vertexClassName;

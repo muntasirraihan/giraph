@@ -651,6 +651,13 @@ public interface GiraphConstants {
   IntConfOption MAX_NUMBER_OF_SUPERSTEPS =
       new IntConfOption("giraph.maxNumberOfSupersteps", 1);
 
+    /**
+     * Akash:
+     * Job Deadline constant.
+     * DEFAULT is 1 hour from time of submission.
+     */
+    LongConfOption JOB_DEADLINE = new LongConfOption("giraph.jobDeadline", (System.currentTimeMillis()/1000L) + 3600L);
+
   /**
    * The application will not mutate the graph topology (the edges). It is used
    * to optimise out-of-core graph, by not writing back edges every time.

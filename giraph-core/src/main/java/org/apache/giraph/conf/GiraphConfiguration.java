@@ -939,4 +939,24 @@ public class GiraphConfiguration extends Configuration
   public boolean isStaticGraph() {
     return STATIC_GRAPH.isTrue(this);
   }
+
+  /**
+   * Akash:
+   * Set the Deadline for the Job.
+   *
+   * @param deadline The deadline for the job.
+   */
+  public final void setJobDeadline(long deadline) {
+    JOB_DEADLINE.set(this, deadline);
+  }
+
+  /**
+   * Akash:
+   * Get the deadline for the current job.
+   *
+   * @return Unix Timestamp of job deadline.
+   */
+  public final long getJobDeadline() {
+    return JOB_DEADLINE.get(this);
+  }
 }
