@@ -1164,6 +1164,8 @@ public interface GiraphConstants {
       new IntConfOption("giraph.async.message.store.threads", 0,
           "Number of threads to be used in async message store.");
 
-
+  LongConfOption JOB_DEADLINE = new LongConfOption("giraph.jobDeadline",
+          (System.currentTimeMillis()/1000L) + 3600L,
+          "Unix timestamp for the job deadline.");
 }
 // CHECKSTYLE: resume InterfaceIsTypeCheck

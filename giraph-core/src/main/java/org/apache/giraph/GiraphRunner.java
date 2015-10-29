@@ -31,7 +31,11 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Arrays;
 
 /**
  * Helper class to run Giraph applications by specifying the actual class name
@@ -50,6 +54,14 @@ public class GiraphRunner implements Tool {
   /** Writable conf */
   private Configuration conf;
 
+  /** Console Constants */
+  private static final String CONSOLE_PROMPT = "DPRG-Giraph >> ";
+  private static final String CONSOLE_COMMAND_EXIT = "exit";
+  private static final String CONSOLE_COMMAND_START = "start";
+  private static final String CONSOLE_COMMAND_STOP = "stop";
+  private static final String CONSOLE_COMMAND_STATUS = "status";
+  private static final String CONSOLE_ARGUMENT = "console";
+
   @Override
   public Configuration getConf() {
     return conf;
@@ -62,11 +74,75 @@ public class GiraphRunner implements Tool {
 
   @Override
   /**
-   * Drives a job run configured for "Giraph on Hadoop MR cluster"
+   * Drives a job run configured for "Giraph on Hadoop MR cluster" or runs the console.
    * @param args the command line arguments
    * @return job run exit code
    */
   public int run(String[] args) throws Exception {
+    LOG.info("Args:" + Arrays.toString(args));
+    if(args[0].toLowerCase().equals(CONSOLE_ARGUMENT)) {
+      runShell();
+    } else {
+      return runNewJob(args);
+    }
+
+    // TODO: Change this. The return value should reflect the jobs return values.
+    return 0;
+  }
+
+  /**
+   * Starts the shell.
+   * @return
+   * @throws Exception
+   */
+  private int runShell() throws Exception {
+    boolean keepRunning = true;
+    while(keepRunning) {
+      System.out.print(CONSOLE_PROMPT);
+      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+      String command = br.readLine();
+      if(processCommand(command) == 0) {
+        keepRunning = false;
+      }
+    }
+
+    // TODO: Change this. The return value should reflect the jobs return values.
+    return 0;
+  }
+
+  private int processCommand(String command) throws Exception {
+    String[] args = command.split("\\s+");
+
+    switch (args[0].toLowerCase()) {
+      case CONSOLE_COMMAND_EXIT:
+        System.out.println("Exiting.");
+        return 0;
+      case CONSOLE_COMMAND_START: // TODO: Add features.
+        System.out.println("Start - NOT IMPLEMENTED.");
+        String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
+        /*
+         * If there is an error / exception, system would crash.
+         */
+        runNewJob(jobArgs);
+        break;
+      case CONSOLE_COMMAND_STATUS: // TODO: Add features.
+        System.out.println("Status - NOT IMPLEMENTED.");
+        break;
+      case CONSOLE_COMMAND_STOP: // TODO: Add features.
+        System.out.println("Stop - NOT IMPLEMENTED.");
+        break;
+    }
+
+    return 1;
+  }
+
+  /**
+   * TODO: Add concurrency.
+   * Creates & Drives a job run configured for "Giraph on Hadoop MR cluster"
+   * @param args the command line arguments
+   * @return job run exit code
+   */
+  private int runNewJob(String[] args) throws Exception {
     if (null == getConf()) { // for YARN profile
       conf = new Configuration();
     }

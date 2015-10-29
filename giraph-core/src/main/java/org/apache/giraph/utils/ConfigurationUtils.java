@@ -125,6 +125,7 @@ public final class ConfigurationUtils {
         "Class that holds types. Needed only if Computation is not set");
     OPTIONS.addOption("jyc", "jythonClass", true,
         "Jython class name, used if computation passed in is a python script");
+    OPTIONS.addOption("dl", "deadline", true, "Deadline for the job. (Unix timestamp)");
     OPTIONS.addOption("ca", "customArguments", true, "provide custom" +
         " arguments for the job configuration in the form:" +
         " -ca <param1>=<value1>,<param2>=<value2> -ca <param3>=<value3> etc." +
@@ -283,6 +284,9 @@ public final class ConfigurationUtils {
           (Class<? extends TypesHolder>)
               Class.forName(cmd.getOptionValue("typesHolder"));
       TYPES_HOLDER_CLASS.set(conf, typesHolderClass);
+    }
+    if (cmd.hasOption("dl")) {
+      conf.setJobDeadline(Long.parseLong(cmd.getOptionValue("dl")));
     }
     if (cmd.hasOption("c")) {
       conf.setMessageCombinerClass(

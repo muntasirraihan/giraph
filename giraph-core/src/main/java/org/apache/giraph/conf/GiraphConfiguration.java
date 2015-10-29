@@ -1124,6 +1124,21 @@ public class GiraphConfiguration extends Configuration
   }
 
   /**
+   * Set deadline for the job.
+   * @param deadline The deadline for the job.
+   */
+  public void setJobDeadline (long deadline) {
+    JOB_DEADLINE.set(this, deadline);
+  }
+
+  /**
+   * Get the deadline for the job.
+   * @return Job's deadline.
+   */
+  public long getJobDeadline () {
+    return JOB_DEADLINE.get(this);
+  }
+  /**
    * Get the output directory to write YourKit snapshots to
    *
    * @param context Map context
