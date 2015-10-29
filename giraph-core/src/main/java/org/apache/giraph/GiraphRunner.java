@@ -167,7 +167,10 @@ public class GiraphRunner implements Tool {
       LOG.debug("Attempting to run Vertex: " + vertexClassName);
     }
     boolean verbose = !cmd.hasOption('q');
-    return job.run(verbose) ? 0 : -1;
+    Thread t = new Thread(job);
+    t.start();
+    //return job.run(verbose) ? 0 : -1;
+    return 0;
   }
 
   /**
