@@ -36,6 +36,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Helper class to run Giraph applications by specifying the actual class name
@@ -61,6 +67,12 @@ public class GiraphRunner implements Tool {
   private static final String CONSOLE_COMMAND_STOP = "stop";
   private static final String CONSOLE_COMMAND_STATUS = "status";
   private static final String CONSOLE_ARGUMENT = "console";
+
+  /** Executors (ThreadPool) for running new jobs  */
+  ExecutorService executor = Executors.newCachedThreadPool();
+
+  /** Collection of Futures to keep track of scheduled jobs. */
+  Set<Future> scheduledJobsFutures = new HashSet<>();
 
   @Override
   public Configuration getConf() {
@@ -123,7 +135,12 @@ public class GiraphRunner implements Tool {
         /*
          * If there is an error / exception, system would crash.
          */
-        runNewJob(jobArgs);
+        try {
+          runNewJob(jobArgs);
+        } catch (Exception e) {
+          LOG.error(e);
+        }
+
         break;
       case CONSOLE_COMMAND_STATUS: // TODO: Add features.
         System.out.println("Status - NOT IMPLEMENTED.");
@@ -166,8 +183,11 @@ public class GiraphRunner implements Tool {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Attempting to run Vertex: " + vertexClassName);
     }
-    boolean verbose = !cmd.hasOption('q');
-    return job.run(verbose) ? 0 : -1;
+
+    job.setVerbosity(!cmd.hasOption('q'));
+    Future jobFuture = executor.submit(job);
+    scheduledJobsFutures.add(jobFuture);
+    return 0;
   }
 
   /**

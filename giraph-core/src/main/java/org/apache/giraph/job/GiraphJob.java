@@ -30,13 +30,14 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 /**
  * Generates an appropriate internal {@link Job} for using Giraph in Hadoop.
  * Uses composition to avoid unwanted {@link Job} methods from exposure
  * to the user.
  */
-public class GiraphJob {
+public class GiraphJob implements Callable {
   static {
     Configuration.addDefaultResource("giraph-site.xml");
   }
@@ -49,6 +50,8 @@ public class GiraphJob {
   private String jobName;
   /** Helper configuration from the job */
   private final GiraphConfiguration giraphConfiguration;
+
+  private boolean verbose = false;
 
   /**
    * Delegated job that simply passes along the class GiraphConfiguration.
@@ -183,6 +186,15 @@ public class GiraphJob {
         Integer.MIN_VALUE) {
       giraphConfiguration.setInt(param, defaultValue);
     }
+  }
+
+  public void setVerbosity (boolean verbose) {
+    this.verbose = verbose;
+  }
+
+  @Override
+  public Object call() throws Exception {
+    return run(verbose);
   }
 
   /**
