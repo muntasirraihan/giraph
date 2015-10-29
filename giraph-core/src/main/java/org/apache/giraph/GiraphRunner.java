@@ -183,7 +183,6 @@ public class GiraphRunner implements Tool {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Attempting to run Vertex: " + vertexClassName);
     }
-
     job.setVerbosity(!cmd.hasOption('q'));
     Future jobFuture = executor.submit(job);
     scheduledJobsFutures.add(jobFuture);
