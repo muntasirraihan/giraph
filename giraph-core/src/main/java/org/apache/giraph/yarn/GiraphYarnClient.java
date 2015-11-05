@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.nio.ByteBuffer;
+import java.util.concurrent.Callable;
 
 /**
  * The initial launcher for a YARN-based Giraph job. This class attempts to
@@ -65,7 +66,7 @@ import java.nio.ByteBuffer;
  * application container to host GiraphApplicationMaster. The RPC connection
  * between the RM and GiraphYarnClient is the YARN ApplicationManager.
  */
-public class GiraphYarnClient {
+public class GiraphYarnClient implements Callable {
   static {
     Configuration.addDefaultResource("giraph-site.xml");
   }
@@ -87,6 +88,8 @@ public class GiraphYarnClient {
   /** Yarn client object */
   private YarnClient yarnClient;
 
+  private boolean verbose = false;
+
   /**
    * Constructor. Requires caller to hand us a GiraphConfiguration.
    *
@@ -102,6 +105,16 @@ public class GiraphYarnClient {
     verifyOutputDirDoesNotExist();
     yarnClient = YarnClient.createYarnClient();
     yarnClient.init(giraphConf);
+  }
+
+  public void setVerbosity (boolean verbose) {
+    this.verbose = verbose;
+  }
+
+  @Override
+  public Object call() throws Exception {
+    System.out.println("GYC: Call");
+    return run(verbose);
   }
 
   /**

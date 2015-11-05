@@ -194,6 +194,7 @@ public class GiraphJob implements Callable {
 
   @Override
   public Object call() throws Exception {
+    System.out.println("GJ: Call");
     return run(verbose);
   }
 

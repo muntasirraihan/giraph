@@ -1130,6 +1130,11 @@ public class BspServiceMaster<I extends WritableComparable,
       partitionOwners =
           masterGraphPartitioner.createInitialPartitionOwners(
               chosenWorkerInfoList, maxWorkers);
+      System.out.println("** PO **");
+      for(PartitionOwner po : partitionOwners) {
+        System.out.print(po.toString());
+        System.out.print(" - ");
+      }
       if (partitionOwners.isEmpty()) {
         throw new IllegalStateException(
             "assignAndExchangePartitions: No partition owners set");
