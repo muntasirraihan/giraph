@@ -18,12 +18,9 @@
 package org.apache.giraph;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.giraph.utils.ConfigurationUtils;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.job.GiraphJob;
-/*if[PURE_YARN]
-import org.apache.giraph.yarn.GiraphYarnClient;
-end[PURE_YARN]*/
+import org.apache.giraph.utils.ConfigurationUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.Path;
@@ -38,10 +35,13 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+/*if[PURE_YARN]
+import org.apache.giraph.yarn.GiraphYarnClient;
+end[PURE_YARN]*/
 
 /**
  * Helper class to run Giraph applications by specifying the actual class name

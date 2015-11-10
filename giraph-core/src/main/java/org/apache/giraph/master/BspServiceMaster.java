@@ -1130,10 +1130,10 @@ public class BspServiceMaster<I extends WritableComparable,
       partitionOwners =
           masterGraphPartitioner.createInitialPartitionOwners(
               chosenWorkerInfoList, maxWorkers);
-      System.out.println("** PO **");
+      LOG.info("** PO **");
       for(PartitionOwner po : partitionOwners) {
-        System.out.print(po.toString());
-        System.out.print(" - ");
+        LOG.info(po.toString());
+        LOG.info(" - ");
       }
       if (partitionOwners.isEmpty()) {
         throw new IllegalStateException(
