@@ -184,10 +184,10 @@ public class GiraphRunner implements Tool {
       LOG.debug("Attempting to run Vertex: " + vertexClassName);
     }
     job.setVerbosity(!cmd.hasOption('q'));
-    //Future jobFuture = executor.submit(job);
-    //scheduledJobsFutures.add(jobFuture);
-    //return 0;
-    return (boolean)job.call() ? 0 : -1;
+    Future jobFuture = executor.submit(job);
+    scheduledJobsFutures.add(jobFuture);
+    return 0;
+    //return (boolean)job.call() ? 0 : -1;
   }
 
   /**
