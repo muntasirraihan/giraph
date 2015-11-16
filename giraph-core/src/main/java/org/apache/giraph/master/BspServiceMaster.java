@@ -1130,7 +1130,7 @@ public class BspServiceMaster<I extends WritableComparable,
       partitionOwners =
           masterGraphPartitioner.createInitialPartitionOwners(
               chosenWorkerInfoList, maxWorkers);
-      LOG.info("MUNTASIR ** PO ** job id: " + conf.get("mapred.job.id", "Unknown Job"));
+      LOG.info("MUNTASIR ** PO ** job id: " + this.getJobId());
       for(PartitionOwner po : partitionOwners) {
     	  
         LOG.info("Partition: " + po.toString());
