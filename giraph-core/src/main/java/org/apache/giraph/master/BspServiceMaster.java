@@ -140,7 +140,7 @@ public class BspServiceMaster<I extends WritableComparable,
   /** Time instance to use for timing */
   private static final Time TIME = SystemTime.get();
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(BspServiceMaster.class);
+  private static final java.util.logging.Logger LOG = Logger.getLogger(BspServiceMaster.class);
   /** Am I the master? */
   private boolean isMaster = false;
   /** Max number of workers */
@@ -1130,9 +1130,14 @@ public class BspServiceMaster<I extends WritableComparable,
       partitionOwners =
           masterGraphPartitioner.createInitialPartitionOwners(
               chosenWorkerInfoList, maxWorkers);
-      LOG.info("** PO **");
+      LOG.info("MUNTASIR ** PO ** job id: " + conf.get("mapred.job.id", "Unknown Job"));
       for(PartitionOwner po : partitionOwners) {
-        LOG.info(po.toString());
+    	  
+        LOG.info("Partition: " + po.toString());
+        LOG.info("MUNTASIR: partition id: "+ po.getPartitionId());
+        LOG.info("MUNTASIR: worker info: " + po.getWorkerInfo());
+        LOG.info("MUNTASIR worker hostname" + po.getWorkerInfo().getHostname());
+        LOG.info("MUNTASIR task id" + po.getWorkerInfo().getTaskId());
         LOG.info(" - ");
       }
       if (partitionOwners.isEmpty()) {
@@ -1480,6 +1485,7 @@ public class BspServiceMaster<I extends WritableComparable,
                                      String inputSplitsType) {
     // Coordinate the workers finishing sending their vertices/edges to the
     // correct workers and signal when everything is done.
+	LOG.info("MUNTASIR: " + inputSplitPaths.getPath());  
     String logPrefix = "coordinate" + inputSplitsType + "InputSplits";
     if (!barrierOnWorkerList(inputSplitPaths.getDonePath(),
         chosenWorkerInfoList,
