@@ -140,7 +140,7 @@ public class BspServiceMaster<I extends WritableComparable,
   /** Time instance to use for timing */
   private static final Time TIME = SystemTime.get();
   /** Class logger */
-  private static final java.util.logging.Logger LOG = Logger.getLogger(BspServiceMaster.class);
+  private static final Logger LOG = Logger.getLogger(BspServiceMaster.class);
   /** Am I the master? */
   private boolean isMaster = false;
   /** Max number of workers */
