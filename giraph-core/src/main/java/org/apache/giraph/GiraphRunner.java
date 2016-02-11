@@ -74,6 +74,9 @@ public class GiraphRunner implements Tool {
   /** Collection of Futures to keep track of scheduled jobs. */
   Set<Future> scheduledJobsFutures = new HashSet<>();
 
+  /** Collection of references to submitted GiraphJobs*/
+  Set<GiraphJob> scheduledJobCallables = new HashSet<>();
+
   @Override
   public Configuration getConf() {
     return conf;
@@ -169,6 +172,11 @@ public class GiraphRunner implements Tool {
       return 0; // user requested help/info printout, don't run a job.
     }
 
+    // print the progress of previously submitted jobs
+    for (GiraphJob job: scheduledJobCallables) {
+      System.out.println(job.getJobName() + ": " + job.getInternalJob().mapProgress());
+    }
+
     // set up job for various platforms
     final String vertexClassName = args[0];
     final String jobName = "Giraph: " + vertexClassName;
@@ -186,6 +194,8 @@ public class GiraphRunner implements Tool {
     job.setVerbosity(!cmd.hasOption('q'));
     Future jobFuture = executor.submit(job);
     scheduledJobsFutures.add(jobFuture);
+    scheduledJobCallables.add(job);
+
     return 0;
     //return (boolean)job.call() ? 0 : -1;
   }
