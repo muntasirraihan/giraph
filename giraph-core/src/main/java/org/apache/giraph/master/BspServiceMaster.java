@@ -1688,6 +1688,7 @@ public class BspServiceMaster<I extends WritableComparable,
     // If the master is halted or all the vertices voted to halt and there
     // are no more messages in the system, stop the computation
     GlobalStats globalStats = aggregateWorkerStats(getSuperstep());
+    LOG.info("Total vertex count: "+globalStats.getVertexCount() + " Finished vertex count: " + globalStats.getFinishedVertexCount());
     if (masterCompute.isHalted() ||
         (globalStats.getFinishedVertexCount() ==
         globalStats.getVertexCount() &&

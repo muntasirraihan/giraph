@@ -174,7 +174,7 @@ public class GiraphRunner implements Tool {
 
     // print the progress of previously submitted jobs
     for (GiraphJob job: scheduledJobCallables) {
-      System.out.println(job.getJobName() + ": " + job.getInternalJob().mapProgress());
+      LOG.info(job.getJobName() + ": " + job.getInternalJob().mapProgress());
     }
 
     // set up job for various platforms
