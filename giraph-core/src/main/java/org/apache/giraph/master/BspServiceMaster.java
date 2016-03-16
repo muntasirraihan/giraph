@@ -25,12 +25,18 @@ import static org.apache.giraph.conf.GiraphConstants.USE_INPUT_SPLIT_LOCALITY;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.BufferedWriter;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -195,6 +201,8 @@ public class BspServiceMaster<I extends WritableComparable,
   private final int checkpointFrequency;
   /** Current checkpoint status */
   private CheckpointStatus checkpointStatus;
+
+  private final String centralAverageVertexCountLog = "/users/mrahman2/GiraphAVCLogs";
 
   /**
    * Constructor for setting up the master.
@@ -1689,6 +1697,12 @@ public class BspServiceMaster<I extends WritableComparable,
     // are no more messages in the system, stop the computation
     GlobalStats globalStats = aggregateWorkerStats(getSuperstep());
     LOG.info("Total vertex count: "+globalStats.getVertexCount() + " Finished vertex count: " + globalStats.getFinishedVertexCount());
+    try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(centralAverageVertexCountLog, true)))) {
+      pw.writeln(getJobId()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount()+);
+    } catch (IOException e) {
+      LOG.debug("Central AVC log write error");
+    }
+
     if (masterCompute.isHalted() ||
         (globalStats.getFinishedVertexCount() ==
         globalStats.getVertexCount() &&
