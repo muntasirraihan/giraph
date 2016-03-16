@@ -1697,8 +1697,9 @@ public class BspServiceMaster<I extends WritableComparable,
     // are no more messages in the system, stop the computation
     GlobalStats globalStats = aggregateWorkerStats(getSuperstep());
     LOG.info("Total vertex count: "+globalStats.getVertexCount() + " Finished vertex count: " + globalStats.getFinishedVertexCount());
-    try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(centralAverageVertexCountLog, true)))) {
-      pw.writeln(getJobId()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount()+);
+    try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(centralAverageVertexCountLog, true)))) 
+    {
+      pw.writeln(getJobId()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount());
     } catch (IOException e) {
       LOG.debug("Central AVC log write error");
     }
