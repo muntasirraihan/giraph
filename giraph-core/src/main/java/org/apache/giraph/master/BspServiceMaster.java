@@ -1699,7 +1699,7 @@ public class BspServiceMaster<I extends WritableComparable,
     LOG.info("Total vertex count: "+globalStats.getVertexCount() + " Finished vertex count: " + globalStats.getFinishedVertexCount());
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(centralAverageVertexCountLog, true)))) 
     {
-      pw.println(getJobId()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount()+" "globalStats.getMessageCount());
+      pw.println(getJobId()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount()+" "+globalStats.getMessageCount());
     } catch (IOException e) {
       LOG.debug("Central AVC log write error");
     }
