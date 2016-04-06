@@ -616,7 +616,7 @@ public class GiraphApplicationMaster {
       File f = new File(containerLogPrefix+appAttemptId.getApplicationId());
       try {
         f.createNewFile();
-      } catch {IOException e} {
+      } catch (IOException e) {
         LOG.debug("Error occurred when creating file for container log for " + appAttemptId.getApplicationId());
       }
       try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))) 
