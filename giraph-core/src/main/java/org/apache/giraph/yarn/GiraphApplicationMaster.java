@@ -614,7 +614,11 @@ public class GiraphApplicationMaster {
       LOG.info("Got response from RM for container ask, allocatedCnt=" +
           allocatedContainers.size());
       File f = new File(containerLogPrefix+appAttemptId.getApplicationId());
-      f.createNewFile();
+      try {
+        f.createNewFile();
+      } catch {IOException e} {
+        LOG.debug("Error occurred when creating file for container log for " + appAttemptId.getApplicationId());
+      }
       try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))) 
       {
         for (Container container: allocatedContainers) {

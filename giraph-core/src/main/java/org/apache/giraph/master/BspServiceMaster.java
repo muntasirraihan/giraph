@@ -1699,7 +1699,11 @@ public class BspServiceMaster<I extends WritableComparable,
     GlobalStats globalStats = aggregateWorkerStats(getSuperstep());
     LOG.info("Total vertex count: "+globalStats.getVertexCount() + " Finished vertex count: " + globalStats.getFinishedVertexCount());
     File f = new File(centralAverageVertexCountLog+getJobId());
-    f.createNewFile();
+    try {
+      f.createNewFile();
+    } catch (IOException e) {
+      LOG.debug("Error occurred when creating file for mc log for " + getJobId());
+    }
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))) 
     {
       pw.println(getJobId()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount()+" "+globalStats.getMessageCount());
