@@ -85,6 +85,10 @@ public class GiraphApplicationMaster {
   private static final int YARN_SUCCESS_EXIT_STATUS = 0;
   /** millis to sleep between heartbeats during long loops */
   private static final int SLEEP_BETWEEN_HEARTBEATS_MSECS = 900;
+
+  /** Log path for list of container allocated **/
+  private final String containerLogPrefix = "/users/mrahman2/Containers_";
+
   /** A reusable map of resources already in HDFS for each task to copy-to-local
    * env and use to launch each GiraphYarnTask. */
   private static Map<String, LocalResource> LOCAL_RESOURCES;
@@ -604,6 +608,17 @@ public class GiraphApplicationMaster {
     public void onContainersAllocated(List<Container> allocatedContainers) {
       LOG.info("Got response from RM for container ask, allocatedCnt=" +
           allocatedContainers.size());
+      File f = new File(containerLogPrefix+appAttemptId.getApplicationId());
+      f.createNewFile();
+      try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))) 
+      {
+        for (Container container: allocatedContainers) {
+          pw.println(container.getNodeHttpAddress());
+        }
+      } catch (IOException e) {
+        LOG.debug("Container log error for application: " + appAttemptId.getApplicationId());
+      }
+      
       allocatedCount.addAndGet(allocatedContainers.size());
       LOG.info("Total allocated # of container so far : " +
         allocatedCount.get() +
