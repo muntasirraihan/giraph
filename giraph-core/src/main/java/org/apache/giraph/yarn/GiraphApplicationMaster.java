@@ -55,6 +55,11 @@ import org.apache.hadoop.yarn.util.Records;
 
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.BufferedWriter;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
