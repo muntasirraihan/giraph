@@ -92,7 +92,7 @@ public class GiraphApplicationMaster {
   private static final int SLEEP_BETWEEN_HEARTBEATS_MSECS = 900;
 
   /** Log path for list of container allocated **/
-  private final String containerLogPrefix = "/users/mrahman2/Containers_";
+  private final String containerLogPrefix = "/users/mrahman2/iss_container_";
 
   /** A reusable map of resources already in HDFS for each task to copy-to-local
    * env and use to launch each GiraphYarnTask. */

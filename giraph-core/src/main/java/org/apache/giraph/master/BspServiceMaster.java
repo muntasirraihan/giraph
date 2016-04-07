@@ -203,7 +203,7 @@ public class BspServiceMaster<I extends WritableComparable,
   /** Current checkpoint status */
   private CheckpointStatus checkpointStatus;
 
-  private final String centralAverageVertexCountLog = "/users/mrahman2/GiraphAVCLogs";
+  private final String centralAverageVertexCountLog = "/users/mrahman2/iss_progress_";
 
   /**
    * Constructor for setting up the master.
