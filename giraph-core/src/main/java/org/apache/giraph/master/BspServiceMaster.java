@@ -1706,7 +1706,7 @@ public class BspServiceMaster<I extends WritableComparable,
     }
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))) 
     {
-      pw.println(getJobId()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount()+" "+globalStats.getMessageCount());
+      pw.println(globalStats.getMessageCount()+" "+globalStats.getFinishedVertexCount()+" "+globalStats.getVertexCount());
     } catch (IOException e) {
       LOG.debug("Central AVC log write error");
     }
