@@ -324,7 +324,6 @@ public class GiraphRunner implements Tool {
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "\"sshCommand\"");
     pb.start();
   }
-i
   /**
    * Script for test ISS scheduling project
    * Run three SSSP jobs with inputgraph1, inputgraph2, inputgraph3, all with worker = numWorkers
