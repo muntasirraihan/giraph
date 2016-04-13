@@ -353,8 +353,8 @@ public class GiraphRunner implements Tool {
    };
    int jobNumber = 3;
    int numWorkers = 16;
-   String issProgressLogPrefix = "/iss_progress_giraph_"; // + applicationId
-   String issContainerLogPrefix = "/iss_container_"; // + applicationId
+   String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_"; // + applicationId
+   String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
    for (int i=0; i<jobNumber; i++) {
     // step 1 
@@ -389,8 +389,8 @@ public class GiraphRunner implements Tool {
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + appId + ".txt");
       // step 9
       for (String container: listOfContainers) {
-        for (int ii = 0; ii < 10; ii++)
-          LOG.info("ssh into container " + container.split(".")[0]);
+        // for (int ii = 0; ii < 10; ii++)
+        //   LOG.info("ssh into container " + container.split(".")[0]);
         sshCopyCommand(container.split(".")[0], inputPaths[i]);
       }
 
