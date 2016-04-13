@@ -338,6 +338,7 @@ public class GiraphRunner implements Tool {
    * 8.   pull job_k's iss_container_log
    * 9.   for each container c in the log, ssh into host of c and run hdfs copy command
    * 10.  resubmit the job with new input
+   * 11.  sleep for 5 seconds, for job to populate its containers
    */
   private void testScheduling() throws Exception {
    String[] inputPaths = new String[] {
@@ -360,7 +361,7 @@ public class GiraphRunner implements Tool {
     processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
     
     // step 2
-    Thread.sleep(100);
+    Thread.sleep(1000);
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -394,6 +395,9 @@ public class GiraphRunner implements Tool {
       // step 10
       processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", numWorkers));
     }
+
+    // step 11
+    Thread.sleep(5000);
    }
 
   }
