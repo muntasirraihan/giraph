@@ -390,7 +390,7 @@ public class GiraphRunner implements Tool {
       // step 9
       for (String container: listOfContainers) {
         // for (int ii = 0; ii < 10; ii++)
-        //   LOG.info("ssh into container " + container.split(".")[0]);
+        LOG.info("ssh into container " + container.split(".")[0]);
         sshCopyCommand(container.split(".")[0], inputPaths[i]);
       }
 
