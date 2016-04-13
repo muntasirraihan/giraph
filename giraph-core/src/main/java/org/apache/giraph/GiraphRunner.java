@@ -337,7 +337,7 @@ public class GiraphRunner implements Tool {
     "/user/output/output1",
     "/user/output/output2",
     "/user/output/output3"
-   }
+   };
    int jobNumber = 3;
    String issProgressLogPrefix = "/iss_progress_giraph_"; // + applicationId
    String issContainerLogPrefix = "/iss_container_"; // + applicationId
