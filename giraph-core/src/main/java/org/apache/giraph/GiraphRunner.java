@@ -244,24 +244,31 @@ public class GiraphRunner implements Tool {
     List<String> ids = new ArrayList<String>();
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(SUBMITTED|ACCEPTED)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    String line = null;
    
-    while ( (line = reader.readLine()) != null) {
-       ids.add(line);
-    }
-    return ids; 
+   try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream())) )
+   {  
+      String line = null;
+      while ( (line = reader.readLine()) != null) {
+         ids.add(line);
+      }
+      return ids; 
+   } catch (IOException e){
+      LOG.debug("Error occurred when reading yarn application fetching accepted.");
+   }
   }
 
   private List<String> yarnApplicationFetchRunning() {
     List<String> ids = new ArrayList<String>();
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(RUNNING)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    String line = null;
-   
-    while ( (line = reader.readLine()) != null) {
-       ids.add(line);
+
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+      String line = null;
+      while ( (line = reader.readLine()) != null) {
+         ids.add(line);
+      }
+    } catch (IOException e) {
+      LOG.debug("Error occurred when reading yarn application fetching running.");
     }
     return ids; 
   }
