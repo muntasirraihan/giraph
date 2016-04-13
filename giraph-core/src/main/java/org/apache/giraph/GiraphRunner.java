@@ -31,6 +31,9 @@ import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,6 +41,10 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import java.util.List;
+import java.util.ArrayList;
+
 
 /*if[PURE_YARN]
 import org.apache.giraph.yarn.GiraphYarnClient;
@@ -67,6 +74,7 @@ public class GiraphRunner implements Tool {
   private static final String CONSOLE_COMMAND_STOP = "stop";
   private static final String CONSOLE_COMMAND_STATUS = "status";
   private static final String CONSOLE_ARGUMENT = "console";
+  private static final String CONSOLE_COMMAND_TEST = "test";
 
   /** Executors (ThreadPool) for running new jobs  */
   ExecutorService executor = Executors.newCachedThreadPool();
@@ -133,7 +141,7 @@ public class GiraphRunner implements Tool {
         System.out.println("Exiting.");
         return 0;
       case CONSOLE_COMMAND_START: // TODO: Add features.
-        System.out.println("Start - NOT IMPLEMENTED.");
+        // System.out.println("Start - NOT IMPLEMENTED.");
         String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
         /*
          * If there is an error / exception, system would crash.
@@ -150,6 +158,13 @@ public class GiraphRunner implements Tool {
         break;
       case CONSOLE_COMMAND_STOP: // TODO: Add features.
         System.out.println("Stop - NOT IMPLEMENTED.");
+        break;
+      case CONSOLE_COMMAND_TEST:
+        try {
+          testScheduling();
+        } catch (Exception e) {
+          LOG.info(e);
+        }
         break;
     }
 
@@ -218,6 +233,156 @@ public class GiraphRunner implements Tool {
       DistributedCache.addCacheFile(new URI(cmd.getOptionValue("cf")),
           job.getConfiguration());
     }
+  }
+
+
+  private String formatSSSPJobCommand(String inputPath, String outputPath, int numWorkers) {
+    return "start org.apache.giraph.examples.SimpleShortestPathsComputation -vif org.apache.giraph.io.formats.JsonLongDoubleFloatDoubleVertexInputFormat -vip " + inputPath + " -vof org.apache.giraph.io.formats.IdWithValueTextOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
+  }
+
+  private List<String> yarnApplicationFetchAccepted() {
+    List<String> ids = new ArrayList<String>();
+    ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(SUBMITTED|ACCEPTED)\' | awk \'{ print $1 }\'");
+    Process process = pb.start();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    String line = null;
+   
+    while ( (line = reader.readLine()) != null) {
+       ids.add(line);
+    }
+    return ids; 
+  }
+
+  private List<String> yarnApplicationFetchRunning() {
+    List<String> ids = new ArrayList<String>();
+    ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(RUNNING)\' | awk \'{ print $1 }\'");
+    Process process = pb.start();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    String line = null;
+   
+    while ( (line = reader.readLine()) != null) {
+       ids.add(line);
+    }
+    return ids; 
+  }
+
+  private void yarnApplicationKillJob(String applicationId) {
+    ProcessBuilder pb = new ProcessBuilder("$HADOOP_HOME/bin/yarn application -kill " + applicationId);
+    pb.start();
+  }
+
+  private int readProgressOfApp(String progressFilePath) {
+    try (BufferedReader br = new BufferedReader(new FileReader(progressFilePath)))
+    {
+      String lastLine = null, currentLine = null;
+
+      while ((currentLine = br.readLine()) != null)
+      {
+          lastLine = currentLine;
+      }
+
+    } catch (IOException e) {
+      LOG.debug("Error occurred when reading progress log at "+progressFilePath);
+    }
+
+    String[] lastLineData = lastLine.split("\\s+");
+    return Integer.parseInt(lastLineData[0]);
+  }
+
+  private List<String> readContainersOfApp(String containerFilePath) {
+    List<String> containers = new ArrayList<String>();
+    try (BufferedReader br = new BufferedReader(new FileReader(progressFilePath)))
+    {
+      String currentLine = null;
+      while ((currentLine = br.readLine()) != null)
+      {
+          containers.add(currentLine);
+      }
+
+    } catch (IOException e) {
+      LOG.debug("Error occurred when reading container log at " + containerFilePath);
+    }
+
+    return containers;
+  }
+
+  private void sshCopyCommand(String hostname, String fileToCopy) {
+    String hdfsCommand = "$HADOOP_HOME/bin/hdfs dfs -cp " + fileToCopy + " " + fileToCopy+".copy.txt";
+    ProcessBuilder pb = new ProcessBuilder("ssh -oStrictHostKeyChecking=no " + hostname + " " + hdfsCommand);
+    pb.start();
+  }
+
+  /**
+   * Script for test ISS scheduling project
+   * Run three SSSP jobs with inputgraph1, inputgraph2, inputgraph3, all with worker = 14
+   * For each job, 
+   * 1. submit
+   * 2. pull "yarn application -list" and check the status of 'latest' job
+   * 3. if status = running, ok
+   * 4. else if status = accepted, 
+   * 5    kill it
+   * 6.   pull "yarn application -list" and check all running job
+   * 7.   pull all iss_progress_log, find job_k with maximum progress
+   * 8.   pull job_k's iss_container_log
+   * 9.   for each container c in the log, ssh into host of c and run hdfs copy command
+   * 10.  resubmit the job with new input
+   */
+  private void testScheduling() throws Exception {
+   String[] inputPaths = new String[] {
+    "/user/input/inputGraph1.txt",
+    "/user/input/inputGraph2.txt",
+    "/user/input/inputGraph3.txt"
+   };
+   String[] outputPaths = new String[] {
+    "/user/output/output1",
+    "/user/output/output2",
+    "/user/output/output3"
+   }
+   int jobNumber = 3;
+   String issProgressLogPrefix = "/iss_progress_giraph_"; // + applicationId
+   String issContainerLogPrefix = "/iss_container_"; // + applicationId
+
+   for (int i=0; i<jobNumber; i++) {
+    // step 1 
+    processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], 14));
+    
+    // step 2
+    Thread.sleep(100);
+    List<String> waitingJobs = yarnApplicationFetchAccepted();
+
+    // step 3 and 4
+    if (!waitingJobs.isEmpty()) {
+      String appId = waitingJobs[0];
+      
+      // step 5
+      yarnApplicationKillJob(appId);
+
+      // step 6
+      List<String> runningJobs = yarnApplicationFetchRunning();
+      
+      // step 7
+      int minOngoingMessage = Integer.MAX_VALUE;
+      String maximumProgressJob = null;
+      for (String appId: runningJobs) {
+        int thisOngoingMessage = readProgressOfApp(issProgressLogPrefix + appId + ".txt");
+        if (minOngoingMessage > thisOngoingMessage) {
+          minOngoingMessage = thisOngoingMessage;
+          maximumProgressJob = appId;
+        }
+      }
+
+      // step 8
+      List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + appId + ".txt");
+      // step 9
+      for (String container: listOfContainers) {
+        sshCopyCommand(container.split(".")[0], inputPaths[i]);
+      }
+
+      // step 10
+      processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt"), outputPaths+"copy");
+    }
+   }
+
   }
 
   /**
