@@ -389,7 +389,7 @@ public class GiraphRunner implements Tool {
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + appId + ".txt");
       // step 9
       for (String container: listOfContainers) {
-        for (int i = 0; i < 10; i++)
+        for (int ii = 0; ii < 10; ii++)
           LOG.info("ssh into container " + container.split(".")[0]);
         sshCopyCommand(container.split(".")[0], inputPaths[i]);
       }
