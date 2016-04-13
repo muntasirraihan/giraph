@@ -385,6 +385,7 @@ public class GiraphRunner implements Tool {
         }
       }
 
+      LOG.info("Find maximum progress job " + maximumProgressJob);
       // step 8
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + appId + ".txt");
       // step 9
