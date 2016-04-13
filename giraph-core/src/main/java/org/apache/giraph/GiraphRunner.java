@@ -272,9 +272,10 @@ public class GiraphRunner implements Tool {
   }
 
   private int readProgressOfApp(String progressFilePath) {
+    String lastline = null;
     try (BufferedReader br = new BufferedReader(new FileReader(progressFilePath)))
     {
-      String lastLine = null, currentLine = null;
+      String currentLine = null;
 
       while ((currentLine = br.readLine()) != null)
       {
@@ -283,15 +284,18 @@ public class GiraphRunner implements Tool {
 
     } catch (IOException e) {
       LOG.debug("Error occurred when reading progress log at "+progressFilePath);
+    } 
+    if (lastline != null) {
+      String[] lastLineData = lastLine.split("\\s+");
+      return Integer.parseInt(lastLineData[0]);
+    } else {
+      return Integer.MAX_VALUE;
     }
-
-    String[] lastLineData = lastLine.split("\\s+");
-    return Integer.parseInt(lastLineData[0]);
   }
 
   private List<String> readContainersOfApp(String containerFilePath) {
     List<String> containers = new ArrayList<String>();
-    try (BufferedReader br = new BufferedReader(new FileReader(progressFilePath)))
+    try (BufferedReader br = new BufferedReader(new FileReader(containerFilePath)))
     {
       String currentLine = null;
       while ((currentLine = br.readLine()) != null)
@@ -352,7 +356,7 @@ public class GiraphRunner implements Tool {
 
     // step 3 and 4
     if (!waitingJobs.isEmpty()) {
-      String appId = waitingJobs[0];
+      String appId = waitingJobs.get(0);
       
       // step 5
       yarnApplicationKillJob(appId);
@@ -363,11 +367,11 @@ public class GiraphRunner implements Tool {
       // step 7
       int minOngoingMessage = Integer.MAX_VALUE;
       String maximumProgressJob = null;
-      for (String appId: runningJobs) {
-        int thisOngoingMessage = readProgressOfApp(issProgressLogPrefix + appId + ".txt");
+      for (String runningJobId: runningJobs) {
+        int thisOngoingMessage = readProgressOfApp(issProgressLogPrefix + runningJobId + ".txt");
         if (minOngoingMessage > thisOngoingMessage) {
           minOngoingMessage = thisOngoingMessage;
-          maximumProgressJob = appId;
+          maximumProgressJob = runningJobId;
         }
       }
 
@@ -379,7 +383,7 @@ public class GiraphRunner implements Tool {
       }
 
       // step 10
-      processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt"), outputPaths+"copy");
+      processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", 14));
     }
    }
 
