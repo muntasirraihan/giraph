@@ -272,7 +272,7 @@ public class GiraphRunner implements Tool {
   }
 
   private int readProgressOfApp(String progressFilePath) {
-    String lastline = null;
+    String lastLine = null;
     try (BufferedReader br = new BufferedReader(new FileReader(progressFilePath)))
     {
       String currentLine = null;
@@ -285,7 +285,7 @@ public class GiraphRunner implements Tool {
     } catch (IOException e) {
       LOG.debug("Error occurred when reading progress log at "+progressFilePath);
     } 
-    if (lastline != null) {
+    if (lastLine != null) {
       String[] lastLineData = lastLine.split("\\s+");
       return Integer.parseInt(lastLineData[0]);
     } else {
