@@ -275,7 +275,7 @@ public class GiraphRunner implements Tool {
   }
 
   private void yarnApplicationKillJob(String applicationId) throws IOException {
-    ProcessBuilder pb = new ProcessBuilder("$HADOOP_HOME/bin/yarn application -kill " + applicationId);
+    ProcessBuilder pb = new ProcessBuilder("bash","-c", "$HADOOP_HOME/bin/yarn application -kill " + applicationId);
     pb.start();
   }
 
@@ -319,7 +319,7 @@ public class GiraphRunner implements Tool {
   }
 
   private void sshCopyCommand(String hostname, String fileToCopy) throws IOException {
-    String hdfsCommand = "$HADOOP_HOME/bin/hdfs dfs -cp " + fileToCopy + " " + fileToCopy+".copy.txt";
+    String hdfsCommand = "bash -c \"$HADOOP_HOME/bin/hdfs dfs -cp " + fileToCopy + " " + fileToCopy+".copy.txt \"";
     ProcessBuilder pb = new ProcessBuilder("ssh -oStrictHostKeyChecking=no " + hostname + " " + hdfsCommand);
     pb.start();
   }
