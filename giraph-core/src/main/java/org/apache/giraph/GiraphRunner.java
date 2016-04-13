@@ -352,16 +352,21 @@ public class GiraphRunner implements Tool {
     "/user/output/output3"
    };
    int jobNumber = 3;
-   int numWorkers = 16;
+   int numWorkers = 14;
    String issProgressLogPrefix = "/iss_progress_giraph_"; // + applicationId
    String issContainerLogPrefix = "/iss_container_"; // + applicationId
+   processCommand(formatSSSPJobCommand(inputPaths[0], outputPaths[0], numWorkers));
+   processCommand(formatSSSPJobCommand(inputPaths[1], outputPaths[1], numWorkers));
+   Thread.sleep(5000);
 
-   for (int i=0; i<jobNumber; i++) {
+   for (int i=2; i<jobNumber; i++) {
     // step 1 
+       //processCommand(formatSSSPJobCommand(inputPaths[0], outputPaths[0], numWorkers));
+       //processCommand(formatSSSPJobCommand(inputPaths[1], outputPaths[2], numWorkers));
     processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
     
     // step 2
-    Thread.sleep(1000);
+    //Thread.sleep(1000);
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -395,10 +400,10 @@ public class GiraphRunner implements Tool {
 
       // step 10
       processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", numWorkers));
-    }
+     }
 
     // step 11
-    Thread.sleep(5000);
+    //Thread.sleep(5000);
    }
 
   }
