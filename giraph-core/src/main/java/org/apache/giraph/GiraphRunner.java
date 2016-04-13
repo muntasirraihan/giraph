@@ -240,7 +240,7 @@ public class GiraphRunner implements Tool {
     return "start org.apache.giraph.examples.SimpleShortestPathsComputation -vif org.apache.giraph.io.formats.JsonLongDoubleFloatDoubleVertexInputFormat -vip " + inputPath + " -vof org.apache.giraph.io.formats.IdWithValueTextOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
   }
 
-  private List<String> yarnApplicationFetchAccepted() {
+  private List<String> yarnApplicationFetchAccepted() throws IOException {
     List<String> ids = new ArrayList<String>();
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(SUBMITTED|ACCEPTED)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
@@ -255,9 +255,10 @@ public class GiraphRunner implements Tool {
    } catch (IOException e){
       LOG.debug("Error occurred when reading yarn application fetching accepted.");
    }
+   return ids;
   }
 
-  private List<String> yarnApplicationFetchRunning() {
+  private List<String> yarnApplicationFetchRunning() throws IOException {
     List<String> ids = new ArrayList<String>();
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(RUNNING)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
@@ -273,7 +274,7 @@ public class GiraphRunner implements Tool {
     return ids; 
   }
 
-  private void yarnApplicationKillJob(String applicationId) {
+  private void yarnApplicationKillJob(String applicationId) throws IOException {
     ProcessBuilder pb = new ProcessBuilder("$HADOOP_HOME/bin/yarn application -kill " + applicationId);
     pb.start();
   }
@@ -317,7 +318,7 @@ public class GiraphRunner implements Tool {
     return containers;
   }
 
-  private void sshCopyCommand(String hostname, String fileToCopy) {
+  private void sshCopyCommand(String hostname, String fileToCopy) throws IOException {
     String hdfsCommand = "$HADOOP_HOME/bin/hdfs dfs -cp " + fileToCopy + " " + fileToCopy+".copy.txt";
     ProcessBuilder pb = new ProcessBuilder("ssh -oStrictHostKeyChecking=no " + hostname + " " + hdfsCommand);
     pb.start();
