@@ -319,11 +319,12 @@ public class GiraphRunner implements Tool {
   }
 
   private void sshCopyCommand(String hostname, String fileToCopy) throws IOException {
-    String hdfsCommand = "bash -c \"$HADOOP_HOME/bin/hdfs dfs -cp " + fileToCopy + " " + fileToCopy+".copy.txt \"";
-    ProcessBuilder pb = new ProcessBuilder("ssh -oStrictHostKeyChecking=no " + hostname + " " + hdfsCommand);
+    String hdfsCommand = "$HADOOP_HOME/bin/hdfs dfs -cp " + fileToCopy + " " + fileToCopy+".copy.txt";
+    String sshCommand = "ssh -oStrictHostKeyChecking=no " + hostname + " " + hdfsCommand;
+    ProcessBuilder pb = new ProcessBuilder("bash", "-c", "\"sshCommand\"");
     pb.start();
   }
-
+i
   /**
    * Script for test ISS scheduling project
    * Run three SSSP jobs with inputgraph1, inputgraph2, inputgraph3, all with worker = numWorkers
