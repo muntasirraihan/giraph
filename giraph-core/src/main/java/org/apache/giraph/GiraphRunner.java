@@ -326,7 +326,7 @@ public class GiraphRunner implements Tool {
 
   /**
    * Script for test ISS scheduling project
-   * Run three SSSP jobs with inputgraph1, inputgraph2, inputgraph3, all with worker = 14
+   * Run three SSSP jobs with inputgraph1, inputgraph2, inputgraph3, all with worker = numWorkers
    * For each job, 
    * 1. submit
    * 2. pull "yarn application -list" and check the status of 'latest' job
@@ -351,12 +351,13 @@ public class GiraphRunner implements Tool {
     "/user/output/output3"
    };
    int jobNumber = 3;
+   int numWorkers = 16;
    String issProgressLogPrefix = "/iss_progress_giraph_"; // + applicationId
    String issContainerLogPrefix = "/iss_container_"; // + applicationId
 
    for (int i=0; i<jobNumber; i++) {
     // step 1 
-    processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], 14));
+    processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
     
     // step 2
     Thread.sleep(100);
@@ -391,7 +392,7 @@ public class GiraphRunner implements Tool {
       }
 
       // step 10
-      processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", 14));
+      processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", numWorkers));
     }
    }
 
