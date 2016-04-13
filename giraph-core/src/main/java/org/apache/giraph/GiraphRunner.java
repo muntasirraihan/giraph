@@ -321,7 +321,7 @@ public class GiraphRunner implements Tool {
   private void sshCopyCommand(String hostname, String fileToCopy) throws IOException {
     String hdfsCommand = "$HADOOP_HOME/bin/hdfs dfs -cp " + fileToCopy + " " + fileToCopy+".copy.txt";
     String sshCommand = "ssh -oStrictHostKeyChecking=no " + hostname + " " + hdfsCommand;
-    ProcessBuilder pb = new ProcessBuilder("bash", "-c", "\"sshCommand\"");
+    ProcessBuilder pb = new ProcessBuilder("bash", "-c", "\"" + sshCommand + "\"");
     pb.start();
   }
   /**
@@ -389,6 +389,7 @@ public class GiraphRunner implements Tool {
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + appId + ".txt");
       // step 9
       for (String container: listOfContainers) {
+        LOG.info("ssh into container " + container.split(".")[0]);
         sshCopyCommand(container.split(".")[0], inputPaths[i]);
       }
 
