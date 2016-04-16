@@ -258,10 +258,15 @@ public class GiraphRunner implements Tool {
     int jobCounter = 1;
     while (true) {
 
-      processCommand(formatSSSPJobCommand(inputPath, outputPath+jobCounter, 14));
-      jobCounter++;
-      Thread.sleep(jobSleepingInterval);
+      try {
+        
+        processCommand(formatSSSPJobCommand(inputPath, outputPath+jobCounter, 14));
+        jobCounter++;
+        Thread.sleep(jobSleepingInterval);
 
+      } catch (Exception e) {
+        LOG.info(e);
+      }
     }
   }
 
