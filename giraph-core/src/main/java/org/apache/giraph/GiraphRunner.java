@@ -411,6 +411,7 @@ public class GiraphRunner implements Tool {
       }
 
       File f = new File(System.currentTimeMillis() + "_mpj=" + maximumProgressJob);
+      f.createNewFile();
       LOG.info("Find maximum progress job " + maximumProgressJob);
       // step 8
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + maximumProgressJob);
