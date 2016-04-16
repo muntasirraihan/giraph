@@ -363,7 +363,7 @@ public class GiraphRunner implements Tool {
     processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
     
     // step 2
-    Thread.sleep(5000);
+    Thread.sleep(10000);
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
