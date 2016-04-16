@@ -351,8 +351,10 @@ public class GiraphRunner implements Tool {
     "/user/output/output2",
     "/user/output/output3"
    };
+
+   int numSSHCommands = 1;
    int jobNumber = 3;
-   int numWorkers = 16;
+   int numWorkers = 14;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
@@ -361,7 +363,7 @@ public class GiraphRunner implements Tool {
     processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
     
     // step 2
-    Thread.sleep(1000);
+    Thread.sleep(5000);
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -378,7 +380,7 @@ public class GiraphRunner implements Tool {
       int minOngoingMessage = Integer.MAX_VALUE;
       String maximumProgressJob = null;
       for (String runningJobId: runningJobs) {
-        int thisOngoingMessage = readProgressOfApp(issProgressLogPrefix + runningJobId + ".txt");
+        int thisOngoingMessage = readProgressOfApp(issProgressLogPrefix + runningJobId);
         if (minOngoingMessage > thisOngoingMessage) {
           minOngoingMessage = thisOngoingMessage;
           maximumProgressJob = runningJobId;
@@ -387,12 +389,15 @@ public class GiraphRunner implements Tool {
 
       LOG.info("Find maximum progress job " + maximumProgressJob);
       // step 8
-      List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + maximumProgressJob + ".txt");
+      List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + maximumProgressJob);
       // step 9
       for (String container: listOfContainers) {
         // for (int ii = 0; ii < 10; ii++)
-        LOG.info("ssh into container " + container.split(".")[0]);
-        sshCopyCommand(container.split(".")[0], inputPaths[i]);
+        LOG.info("ssh into container " + container.split("\\.")[0]);
+        sshCopyCommand(container.split("\\.")[0], inputPaths[i]);
+        numSSHCommands--;
+        if (numSSHCommands == 0)
+          break;
       }
 
       // step 10
@@ -400,7 +405,7 @@ public class GiraphRunner implements Tool {
     }
 
     // step 11
-    Thread.sleep(5000);
+    // Thread.sleep(5000);
    }
 
   }
