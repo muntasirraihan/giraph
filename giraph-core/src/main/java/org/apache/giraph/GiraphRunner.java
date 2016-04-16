@@ -263,7 +263,7 @@ public class GiraphRunner implements Tool {
       String line = null;
       while ( (line = reader.readLine()) != null) {
          ids.add(line);
-          pw.writeln(line);
+          pw.println(line);
       }
       return ids; 
    } catch (IOException e){
@@ -289,7 +289,7 @@ public class GiraphRunner implements Tool {
       String line = null;
       while ( (line = reader.readLine()) != null) {
          ids.add(line);
-         pw.writeln(line);
+         pw.println(line);
       }
     } catch (IOException e) {
       LOG.debug("Error occurred when reading yarn application fetching running.");
