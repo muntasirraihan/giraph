@@ -245,11 +245,20 @@ public class GiraphRunner implements Tool {
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(SUBMITTED|ACCEPTED)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
    
-   try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream())) )
+    File f = new File("/users/mrahman2/yarnApplicationFetchAcceptedOutput"+System.currentTimeMillis());
+    try {
+      f.createNewFile();
+    } catch (IOException e) {
+    }
+
+   try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))
+    )
    {  
       String line = null;
       while ( (line = reader.readLine()) != null) {
          ids.add(line);
+          pw.writeln(line);
       }
       return ids; 
    } catch (IOException e){
@@ -263,10 +272,19 @@ public class GiraphRunner implements Tool {
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(RUNNING)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
 
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+     File f = new File("/users/mrahman2/yarnApplicationFetchRunningOutput"+System.currentTimeMillis());
+    try {
+      f.createNewFile();
+    } catch (IOException e) {
+    }
+
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+          PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))
+      ) {
       String line = null;
       while ( (line = reader.readLine()) != null) {
          ids.add(line);
+         pw.writeln(line);
       }
     } catch (IOException e) {
       LOG.debug("Error occurred when reading yarn application fetching running.");
