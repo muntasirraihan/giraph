@@ -80,6 +80,7 @@ public class GiraphRunner implements Tool {
   private static final String CONSOLE_COMMAND_STATUS = "status";
   private static final String CONSOLE_ARGUMENT = "console";
   private static final String CONSOLE_COMMAND_TEST = "test";
+  private static final String CONSOLE_COMMAND_BUSY = "busy";
 
   /** Executors (ThreadPool) for running new jobs  */
   ExecutorService executor = Executors.newCachedThreadPool();
@@ -171,6 +172,12 @@ public class GiraphRunner implements Tool {
           LOG.info(e);
         }
         break;
+      case CONSOLE_COMMAND_BUSY:
+        try {
+          busy();
+        } catch (Exception e) {
+          LOG.info(e);
+        }
     }
 
     return 1;
@@ -240,6 +247,23 @@ public class GiraphRunner implements Tool {
     }
   }
 
+  /**
+    * Every interval of time, the console will start a small job to keep the cluster
+    */
+  private void busy() {
+    int jobSleepingInterval = 30 * 60 * 1000; // 30 minutes
+    String inputPath = "/user/input/inputGraph2.txt";
+    String outputPath = "/user/output/busy/";
+
+    int jobCounter = 1;
+    while (true) {
+
+      processCommand(formatSSSPJobCommand(inputPath, outputPath+jobCounter, 14));
+      jobCounter++;
+      Thread.sleep(jobSleepingInterval);
+
+    }
+  }
 
   private String formatSSSPJobCommand(String inputPath, String outputPath, int numWorkers) {
     return "start org.apache.giraph.examples.SimpleShortestPathsComputation -vif org.apache.giraph.io.formats.JsonLongDoubleFloatDoubleVertexInputFormat -vip " + inputPath + " -vof org.apache.giraph.io.formats.IdWithValueTextOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
