@@ -355,7 +355,7 @@ public class GiraphRunner implements Tool {
    int numSSHCommands = 1;
    int jobNumber = 3;
    int numWorkers = 14;
-   String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_"; // + applicationId
+   String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
    for (int i=0; i<jobNumber; i++) {
