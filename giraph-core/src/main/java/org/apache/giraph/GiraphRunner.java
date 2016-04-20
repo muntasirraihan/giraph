@@ -461,6 +461,8 @@ public class GiraphRunner implements Tool {
           break;
       }
 
+      Thread.sleep(5000);
+
       // step 10
       processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", numWorkers));
     }
