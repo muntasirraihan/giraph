@@ -439,7 +439,7 @@ public class GiraphRunner implements Tool {
         }
       }
 
-      File f = new File(System.currentTimeMillis() + "_mpj=" + maximumProgressJob);
+      File f = new File("/users/mrahman2/" + System.currentTimeMillis() + "_mpj=" + maximumProgressJob);
       f.createNewFile();
       LOG.info("Find maximum progress job " + maximumProgressJob);
       // step 8
