@@ -282,6 +282,9 @@ public class GiraphRunner implements Tool {
     return "start org.apache.giraph.examples.SimpleShortestPathsComputation -vif org.apache.giraph.io.formats.JsonLongDoubleFloatDoubleVertexInputFormat -vip " + inputPath + " -vof org.apache.giraph.io.formats.IdWithValueTextOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
   }
 
+  /*
+   *  Fetch the currently running applications using 'yarn application -list'
+   */
   private List<String> yarnApplicationFetchAccepted() throws IOException {
     List<String> ids = new ArrayList<String>();
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(SUBMITTED|ACCEPTED)\' | awk \'{ print $1 }\'");
@@ -309,6 +312,9 @@ public class GiraphRunner implements Tool {
    return ids;
   }
 
+  /*
+   *  Fetch the currently running applications using 'yarn application -list'
+   */
   private List<String> yarnApplicationFetchRunning() throws IOException {
     List<String> ids = new ArrayList<String>();
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(RUNNING)\' | awk \'{ print $1 }\'");
@@ -339,6 +345,9 @@ public class GiraphRunner implements Tool {
     pb.start();
   }
 
+  /*
+   *  Fetch the progress for an application given the log path
+   */
   private int readProgressOfApp(String progressFilePath) {
     String lastLine = null;
     try (BufferedReader br = new BufferedReader(new FileReader(progressFilePath)))
@@ -361,6 +370,9 @@ public class GiraphRunner implements Tool {
     }
   }
 
+  /*
+   * Fetch the list of containers for an application given the log path
+   */
   private List<String> readContainersOfApp(String containerFilePath) {
     List<String> containers = new ArrayList<String>();
     try (BufferedReader br = new BufferedReader(new FileReader(containerFilePath)))
