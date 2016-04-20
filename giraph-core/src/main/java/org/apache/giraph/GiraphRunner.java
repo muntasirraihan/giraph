@@ -444,6 +444,13 @@ public class GiraphRunner implements Tool {
       LOG.info("Find maximum progress job " + maximumProgressJob);
       // step 8
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + maximumProgressJob);
+      try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true))) ) 
+      {
+        for (String container: listOfContainers)
+          pw.println(container);
+      } catch (IOException e) {
+        LOG.info("Error occurred in logging containers for " + maximumProgressJob);
+      }
       // step 9
       for (String container: listOfContainers) {
         // for (int ii = 0; ii < 10; ii++)
