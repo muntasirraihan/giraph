@@ -80,6 +80,7 @@ public class GiraphRunner implements Tool {
   private static final String CONSOLE_COMMAND_STATUS = "status";
   private static final String CONSOLE_ARGUMENT = "console";
   private static final String CONSOLE_COMMAND_TEST = "test";
+  private static final String CONSOLE_COMMAND_TEST = "base";  
   private static final String CONSOLE_COMMAND_BUSY = "busy";
 
   /** Executors (ThreadPool) for running new jobs  */
@@ -168,6 +169,13 @@ public class GiraphRunner implements Tool {
       case CONSOLE_COMMAND_TEST:
         try {
           testScheduling();
+        } catch (Exception e) {
+          LOG.info(e);
+        }
+        break;
+      case CONSOLE_COMMAND_BASE:
+        try {
+          testSchedulingBase();
         } catch (Exception e) {
           LOG.info(e);
         }
@@ -279,20 +287,20 @@ public class GiraphRunner implements Tool {
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(SUBMITTED|ACCEPTED)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
    
-    File f = new File("/users/mrahman2/yarnApplicationFetchAcceptedOutput"+System.currentTimeMillis());
-    try {
-      f.createNewFile();
-    } catch (IOException e) {
-    }
+    // File f = new File("/users/mrahman2/yarnApplicationFetchAcceptedOutput"+System.currentTimeMillis());
+    // try {
+    //   f.createNewFile();
+    // } catch (IOException e) {
+    // }
 
-   try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))
+   try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))
+    // ; PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))
     )
    {  
       String line = null;
       while ( (line = reader.readLine()) != null) {
          ids.add(line);
-          pw.println(line);
+          // pw.println(line);
       }
       return ids; 
    } catch (IOException e){
@@ -306,19 +314,19 @@ public class GiraphRunner implements Tool {
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", "$HADOOP_HOME/bin/yarn application -list 2>/dev/null | grep -E \'application_.*(RUNNING)\' | awk \'{ print $1 }\'");
     Process process = pb.start();
 
-     File f = new File("/users/mrahman2/yarnApplicationFetchRunningOutput"+System.currentTimeMillis());
-    try {
-      f.createNewFile();
-    } catch (IOException e) {
-    }
+    // File f = new File("/users/mrahman2/yarnApplicationFetchRunningOutput"+System.currentTimeMillis());
+    // try {
+    //   f.createNewFile();
+    // } catch (IOException e) {
+    // }
 
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-          PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))
+        // ; PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true)))
       ) {
       String line = null;
       while ( (line = reader.readLine()) != null) {
          ids.add(line);
-         pw.println(line);
+         // pw.println(line);
       }
     } catch (IOException e) {
       LOG.debug("Error occurred when reading yarn application fetching running.");
@@ -376,6 +384,35 @@ public class GiraphRunner implements Tool {
     ProcessBuilder pb = new ProcessBuilder("bash", "-c", sshCommand);
     pb.start();
   }
+
+  /**
+    *
+    * Function to monitor baseline performance without opportunistic scheduling
+    */
+  private void testSchedulingBase() throws Exception {
+    String[] inputPaths = new String[] {
+    "/user/input/inputGraph1.txt",
+    "/user/input/inputGraph2.txt",
+    "/user/input/inputGraph3.txt"
+     };
+     String[] outputPaths = new String[] {
+      "/user/output/output1",
+      "/user/output/output2",
+      "/user/output/output3"
+     };
+
+     int numSSHCommands = 1;
+     int jobNumber = 3;
+     int numWorkers = 14;
+     String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
+     String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
+
+     for (int i=0; i<jobNumber; i++) {
+      // step 1 
+      processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
+    }
+  }
+
   /**
    * Script for test ISS scheduling project
    * Run three SSSP jobs with inputgraph1, inputgraph2, inputgraph3, all with worker = numWorkers
@@ -439,18 +476,19 @@ public class GiraphRunner implements Tool {
         }
       }
 
-      File f = new File("/users/mrahman2/" + System.currentTimeMillis() + "_mpj=" + maximumProgressJob);
-      f.createNewFile();
+      // File f = new File("/users/mrahman2/" + System.currentTimeMillis() + "_mpj=" + maximumProgressJob);
+      // f.createNewFile();
       LOG.info("Find maximum progress job " + maximumProgressJob);
+      
       // step 8
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + maximumProgressJob);
-      try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true))) ) 
-      {
-        for (String container: listOfContainers)
-          pw.println(container);
-      } catch (IOException e) {
-        LOG.info("Error occurred in logging containers for " + maximumProgressJob);
-      }
+      // try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true))) ) 
+      // {
+      //   for (String container: listOfContainers)
+      //     pw.println(container);
+      // } catch (IOException e) {
+      //   LOG.info("Error occurred in logging containers for " + maximumProgressJob);
+      // }
       // step 9
       for (String container: listOfContainers) {
         // for (int ii = 0; ii < 10; ii++)
