@@ -420,8 +420,8 @@ public class GiraphRunner implements Tool {
      String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
      for (int i=0; i<jobNumber; i++) {
-      // step 1 
       processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
+      Thread.sleep(10000);
     }
   }
 
