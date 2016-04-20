@@ -80,7 +80,7 @@ public class GiraphRunner implements Tool {
   private static final String CONSOLE_COMMAND_STATUS = "status";
   private static final String CONSOLE_ARGUMENT = "console";
   private static final String CONSOLE_COMMAND_TEST = "test";
-  private static final String CONSOLE_COMMAND_TEST = "base";  
+  private static final String CONSOLE_COMMAND_BASE = "base";  
   private static final String CONSOLE_COMMAND_BUSY = "busy";
 
   /** Executors (ThreadPool) for running new jobs  */
