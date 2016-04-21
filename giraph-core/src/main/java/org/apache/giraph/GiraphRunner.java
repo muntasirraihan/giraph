@@ -398,31 +398,110 @@ public class GiraphRunner implements Tool {
   }
 
   /**
-    *
     * Function to monitor baseline performance without opportunistic scheduling
+    * Yarn polling, log reading are still enabled to perform a fair comparison with opportunistic scheduling
     */
+  // private void testSchedulingBase() throws Exception {
+  //   String[] inputPaths = new String[] {
+  //   "/user/input/inputGraph1.txt",
+  //   "/user/input/inputGraph2.txt",
+  //   "/user/input/inputGraph3.txt"
+  //    };
+  //    String[] outputPaths = new String[] {
+  //     "/user/output/output1",
+  //     "/user/output/output2",
+  //     "/user/output/output3"
+  //    };
+
+  //    int numSSHCommands = 1;
+  //    int jobNumber = 3;
+  //    int numWorkers = 14;
+  //    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
+  //    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
+
+  //    for (int i=0; i<jobNumber; i++) {
+  //     processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
+  //     Thread.sleep(10000);
+  //   }
+  // }
   private void testSchedulingBase() throws Exception {
-    String[] inputPaths = new String[] {
+   String[] inputPaths = new String[] {
     "/user/input/inputGraph1.txt",
     "/user/input/inputGraph2.txt",
     "/user/input/inputGraph3.txt"
-     };
-     String[] outputPaths = new String[] {
-      "/user/output/output1",
-      "/user/output/output2",
-      "/user/output/output3"
-     };
+   };
+   String[] outputPaths = new String[] {
+    "/user/output/output1",
+    "/user/output/output2",
+    "/user/output/output3"
+   };
 
-     int numSSHCommands = 1;
-     int jobNumber = 3;
-     int numWorkers = 14;
-     String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
-     String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
+   int numSSHCommands = 1;
+   int jobNumber = 3;
+   int numWorkers = 14;
+   String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
+   String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
-     for (int i=0; i<jobNumber; i++) {
-      processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
-      Thread.sleep(10000);
+   for (int i=0; i<jobNumber; i++) {
+    // step 1 
+    processCommand(formatSSSPJobCommand(inputPaths[i], outputPaths[i], numWorkers));
+    
+    // step 2
+    Thread.sleep(10000);
+    List<String> waitingJobs = yarnApplicationFetchAccepted();
+
+    // step 3 and 4
+    if (!waitingJobs.isEmpty()) {
+      String appId = waitingJobs.get(0);
+      
+      // step 5
+      // yarnApplicationKillJob(appId);
+
+      // step 6
+      List<String> runningJobs = yarnApplicationFetchRunning();
+      
+      // step 7
+      int minOngoingMessage = Integer.MAX_VALUE;
+      String maximumProgressJob = null;
+      for (String runningJobId: runningJobs) {
+        int thisOngoingMessage = readProgressOfApp(issProgressLogPrefix + runningJobId);
+        if (minOngoingMessage > thisOngoingMessage) {
+          minOngoingMessage = thisOngoingMessage;
+          maximumProgressJob = runningJobId;
+        }
+      }
+
+      // File f = new File("/users/mrahman2/" + System.currentTimeMillis() + "_mpj=" + maximumProgressJob);
+      // f.createNewFile();
+      // LOG.info("Find maximum progress job " + maximumProgressJob);
+      
+      // step 8
+      List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + maximumProgressJob);
+      // try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f, true))) ) 
+      // {
+      //   for (String container: listOfContainers)
+      //     pw.println(container);
+      // } catch (IOException e) {
+      //   LOG.info("Error occurred in logging containers for " + maximumProgressJob);
+      // }
+      // step 9
+      // for (String container: listOfContainers) {
+      //   // for (int ii = 0; ii < 10; ii++)
+      //   LOG.info("ssh into container " + container.split("\\.")[0]);
+      //   sshCopyCommand(container.split("\\.")[0], inputPaths[i]);
+      //   numSSHCommands--;
+      //   if (numSSHCommands == 0)
+      //     break;
+      // }
+
+      // step 10
+      Thread.sleep(7500);
+
+      // step 11
+      // processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", numWorkers));
     }
+   }
+
   }
 
   /**
@@ -430,7 +509,7 @@ public class GiraphRunner implements Tool {
    * Run three SSSP jobs with inputgraph1, inputgraph2, inputgraph3, all with worker = numWorkers
    * For each job, 
    * 1. submit
-   * 2. pull "yarn application -list" and check the status of 'latest' job
+   * 2. sleep for a while, then pull "yarn application -list" and check the status of 'latest' job
    * 3. if status = running, ok
    * 4. else if status = accepted, 
    * 5    kill it
@@ -438,8 +517,8 @@ public class GiraphRunner implements Tool {
    * 7.   pull all iss_progress_log, find job_k with maximum progress
    * 8.   pull job_k's iss_container_log
    * 9.   for each container c in the log, ssh into host of c and run hdfs copy command
-   * 10.  resubmit the job with new input
-   * 11.  sleep for 5 seconds, for job to populate its containers
+   * 10.  sleep and wait for copy to finish
+   * 11.  resubmit the job with new input
    */
   private void testScheduling() throws Exception {
    String[] inputPaths = new String[] {
@@ -501,6 +580,7 @@ public class GiraphRunner implements Tool {
       // } catch (IOException e) {
       //   LOG.info("Error occurred in logging containers for " + maximumProgressJob);
       // }
+
       // step 9
       for (String container: listOfContainers) {
         // for (int ii = 0; ii < 10; ii++)
@@ -511,14 +591,12 @@ public class GiraphRunner implements Tool {
           break;
       }
 
+      // step 10
       Thread.sleep(7500);
 
-      // step 10
+      // step 11
       processCommand(formatSSSPJobCommand(inputPaths[i]+".copy.txt", outputPaths+"copy", numWorkers));
     }
-
-    // step 11
-    // Thread.sleep(5000);
    }
 
   }
