@@ -412,8 +412,8 @@ public class GiraphRunner implements Tool {
   private void testSchedulingBase() throws Exception {
 
    int numSSHCommands = 1;
-   int jobNumber = 10;
-   int numWorkers = 6;
+   int jobNumber = 3;
+   int numWorkers = 3;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
@@ -477,8 +477,8 @@ public class GiraphRunner implements Tool {
   private void testScheduling() throws Exception {
 
    int numSSHCommands = 1;
-   int jobNumber = 10;
-   int numWorkers = 14;
+   int jobNumber = 3;
+   int numWorkers = 3;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
