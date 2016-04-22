@@ -419,7 +419,7 @@ public class GiraphRunner implements Tool {
 
    for (int i=0; i<jobNumber; i++) {
     // step 1 
-    processCommand(formatSSSPJobCommand(formatInputPaths(i), formatOutputPath(i), numWorkers));
+    processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
     
     // step 2
     Thread.sleep(10000);
@@ -452,7 +452,7 @@ public class GiraphRunner implements Tool {
       Thread.sleep(7500);
 
       // step 11
-      // processCommand(formatSSSPJobCommand(formatInputPaths(i)+".copy.txt", formatOutputPath(i)opy", numWorkers));
+      // processCommand(formatSSSPJobCommand(formatInputPath(i)+".copy.txt", formatOutputPath(i)opy", numWorkers));
     }
    }
 
@@ -484,7 +484,7 @@ public class GiraphRunner implements Tool {
 
    for (int i=0; i<jobNumber; i++) {
     // step 1 
-    processCommand(formatSSSPJobCommand(formatInputPaths(i), formatOutputPath(i), numWorkers));
+    processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
     
     // step 2
     Thread.sleep(10000);
@@ -529,7 +529,7 @@ public class GiraphRunner implements Tool {
       for (String container: listOfContainers) {
         // for (int ii = 0; ii < 10; ii++)
         LOG.info("ssh into container " + container.split("\\.")[0]);
-        sshCopyCommand(container.split("\\.")[0], formatInputPaths(i));
+        sshCopyCommand(container.split("\\.")[0], formatInputPath(i));
         numSSHCommands--;
         if (numSSHCommands == 0)
           break;
@@ -539,7 +539,7 @@ public class GiraphRunner implements Tool {
       Thread.sleep(7500);
 
       // step 11
-      processCommand(formatSSSPJobCommand(formatInputPaths(i)+".copy.txt", formatOutputPath(i)+"copy", numWorkers));
+      processCommand(formatSSSPJobCommand(formatInputPath(i)+".copy.txt", formatOutputPath(i)+"copy", numWorkers));
     }
    }
 
