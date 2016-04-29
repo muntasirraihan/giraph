@@ -142,6 +142,7 @@ public class GiraphRunner implements Tool {
 
   private int processCommand(String command) throws Exception {
     String[] args = command.split("\\s+");
+      String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
 
     switch (args[0].toLowerCase()) {
       case CONSOLE_COMMAND_EXIT:
@@ -149,7 +150,6 @@ public class GiraphRunner implements Tool {
         return 0;
       case CONSOLE_COMMAND_START: // TODO: Add features.
         // System.out.println("Start - NOT IMPLEMENTED.");
-        String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
         /*
          * If there is an error / exception, system would crash.
          */
@@ -167,7 +167,6 @@ public class GiraphRunner implements Tool {
         System.out.println("Stop - NOT IMPLEMENTED.");
         break;
       case CONSOLE_COMMAND_TEST:
-        String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
 
         try {
           testScheduling(jobArgs);
@@ -176,8 +175,6 @@ public class GiraphRunner implements Tool {
         }
         break;
       case CONSOLE_COMMAND_BASE:
-
-        String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
 
         try {
           testSchedulingBase(jobArgs);
