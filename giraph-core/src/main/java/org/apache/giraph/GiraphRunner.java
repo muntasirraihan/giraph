@@ -543,13 +543,14 @@ public class GiraphRunner implements Tool {
       //   LOG.info("Error occurred in logging containers for " + maximumProgressJob);
       // }
 
+      int sshCopyCommandTrials = numSSHCommands;
       // step 9
       for (String container: listOfContainers) {
         // for (int ii = 0; ii < 10; ii++)
         LOG.info("ssh into container " + container.split("\\.")[0]);
         sshCopyCommand(container.split("\\.")[0], formatInputPath(i));
-        numSSHCommands--;
-        if (numSSHCommands == 0)
+        sshCopyCommandTrials--;
+        if (sshCopyCommandTrials == 0)
           break;
       }
 
