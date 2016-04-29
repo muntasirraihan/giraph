@@ -167,15 +167,20 @@ public class GiraphRunner implements Tool {
         System.out.println("Stop - NOT IMPLEMENTED.");
         break;
       case CONSOLE_COMMAND_TEST:
+        String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
+
         try {
-          testScheduling();
+          testScheduling(jobArgs);
         } catch (Exception e) {
           LOG.info(e);
         }
         break;
       case CONSOLE_COMMAND_BASE:
+
+        String[] jobArgs = Arrays.copyOfRange(args, 1, args.length);
+
         try {
-          testSchedulingBase();
+          testSchedulingBase(jobArgs);
         } catch (Exception e) {
           LOG.info(e);
         }
@@ -409,11 +414,19 @@ public class GiraphRunner implements Tool {
     * Function to monitor baseline performance without opportunistic scheduling
     * Yarn polling, log reading are still enabled to perform a fair comparison with opportunistic scheduling
     */
-  private void testSchedulingBase() throws Exception {
+  private void testSchedulingBase(String[] args) throws Exception {
+
+   /*
+    * list of parameters:
+    * start j w t1 t2
+    */ 
+
+   int jobNumber = Integer.parseInt(args[0]);
+   int numWorkers = Integer.parseInt(args[1]);
+   int jobInterval = Integer.parseInt(args[2]) * 1000;
+   int copyWaiting = Integer.parseInt(args[3]) * 1000;
 
    int numSSHCommands = 1;
-   int jobNumber = 3;
-   int numWorkers = 3;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
@@ -422,7 +435,7 @@ public class GiraphRunner implements Tool {
     processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
     
     // step 2
-    Thread.sleep(10000);
+    Thread.sleep(jobInterval);
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -449,7 +462,7 @@ public class GiraphRunner implements Tool {
       List<String> listOfContainers = readContainersOfApp(issContainerLogPrefix + maximumProgressJob);
 
       // step 10
-      Thread.sleep(7500);
+      Thread.sleep(copyWaiting);
 
       // step 11
       // processCommand(formatSSSPJobCommand(formatInputPath(i)+".copy.txt", formatOutputPath(i)opy", numWorkers));
@@ -474,11 +487,19 @@ public class GiraphRunner implements Tool {
    * 10.  sleep and wait for copy to finish
    * 11.  resubmit the job with new input
    */
-  private void testScheduling() throws Exception {
+  private void testScheduling(String[] args) throws Exception {
+
+   /*
+    * list of parameters:
+    * start j w t1 t2
+    */ 
+
+   int jobNumber = Integer.parseInt(args[0]);
+   int numWorkers = Integer.parseInt(args[1]);
+   int jobInterval = Integer.parseInt(args[2]) * 1000;
+   int copyWaiting = Integer.parseInt(args[3]) * 1000;
 
    int numSSHCommands = 1;
-   int jobNumber = 3;
-   int numWorkers = 3;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
 
@@ -487,7 +508,7 @@ public class GiraphRunner implements Tool {
     processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
     
     // step 2
-    Thread.sleep(10000);
+    Thread.sleep(jobInterval);
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -536,7 +557,7 @@ public class GiraphRunner implements Tool {
       }
 
       // step 10
-      Thread.sleep(7500);
+      Thread.sleep(copyWaiting);
 
       // step 11
       processCommand(formatSSSPJobCommand(formatInputPath(i)+".copy.txt", formatOutputPath(i)+"copy", numWorkers));
