@@ -49,7 +49,7 @@ import java.util.concurrent.Future;
 
 import java.util.List;
 import java.util.ArrayList;
-
+import java.util.Random;
 
 /*if[PURE_YARN]
 import org.apache.giraph.yarn.GiraphYarnClient;
@@ -257,6 +257,14 @@ public class GiraphRunner implements Tool {
     }
   }
 
+    /**
+     * Generate random exponential numbers to model inter-arrival time
+     */
+    private double getRandom(Random r, double mean) {
+	return -(Math.log(r.nextDouble()) * mean);
+    }  
+    
+
   /**
     * Every interval of time, the console will start a small job to keep the cluster
     */
@@ -420,7 +428,8 @@ public class GiraphRunner implements Tool {
 
    int jobNumber = Integer.parseInt(args[0]);
    int numWorkers = Integer.parseInt(args[1]);
-   int jobInterval = Integer.parseInt(args[2]) * 1000;
+   //int jobInterval = Integer.parseInt(args[2]) * 1000;
+   int jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
    int copyWaiting = Integer.parseInt(args[3]) * 1000;
 
    int numSSHCommands = 1;
@@ -493,7 +502,8 @@ public class GiraphRunner implements Tool {
 
    int jobNumber = Integer.parseInt(args[0]);
    int numWorkers = Integer.parseInt(args[1]);
-   int jobInterval = Integer.parseInt(args[2]) * 1000;
+   //int jobInterval = Integer.parseInt(args[2]) * 1000;
+   int jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000); 
    int copyWaiting = Integer.parseInt(args[3]) * 1000;
 
    int numSSHCommands = 1;

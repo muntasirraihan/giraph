@@ -15,8 +15,8 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	unsigned int nodeCount = 100 * K;
-	unsigned int maxExpectedDegree = 5 * K;
+	unsigned int nodeCount = 500 * K;
+	unsigned int maxExpectedDegree = 25 * K;
 	unsigned int maxEdgeWeight = 100;
 
 	vector< list< pair<unsigned int, unsigned int> > > nodes;
