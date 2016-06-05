@@ -33,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileInputStream;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -435,13 +436,28 @@ public class GiraphRunner implements Tool {
    int numSSHCommands = 1;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
+   // hack for Yahoo Job Trace
+   FileInputStream fstream = new FileInputStream("/proj/ISS/scheduling/dataset/yahoo-trace-interarrivaltimes.txt");
+   BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+   String nextInterArrivalTime = "";
+   int nextIntArrTime = 0;
 
    for (int i=0; i<jobNumber; i++) {
     // step 1 
     processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
     
+    // read next inter-arrival time from Yahoo trace
+    if ((nextInterArrivalTime = br.readLine()) != null) {
+	nextIntArrTime = Integer.parseInt(nextInterArrivalTime);
+    }
+    else {
+	nextIntArrTime = 0; // if data missing, just use a default of 0
+    }
+    
     // step 2
-    Thread.sleep(jobInterval);
+    //Thread.sleep(jobInterval);
+    // jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
+    Thread.sleep(nextIntArrTime); // nextIntArrTime is in millisec
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -474,7 +490,7 @@ public class GiraphRunner implements Tool {
       // processCommand(formatSSSPJobCommand(formatInputPath(i)+".copy.txt", formatOutputPath(i)opy", numWorkers));
     }
    }
-
+   br.close();
   }
 
   /**
@@ -509,13 +525,32 @@ public class GiraphRunner implements Tool {
    int numSSHCommands = 1;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
    String issContainerLogPrefix = "/users/mrahman2/iss_container_"; // + applicationId
+   // hack for Yahoo Job Trace                                                                                                                                                                              
+   FileInputStream fstream = new FileInputStream("/proj/ISS/scheduling/dataset/yahoo-trace-interarrivaltimes.txt");
+   BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+   String nextInterArrivalTime = "";
+   int nextIntArrTime = 0;
+
 
    for (int i=0; i<jobNumber; i++) {
     // step 1 
     processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
     
+
+    if ((nextInterArrivalTime = br.readLine()) != null) {
+        nextIntArrTime = Integer.parseInt(nextInterArrivalTime);
+    }
+    else {
+        nextIntArrTime = 0; // if data missing, just use a default of 0                                                                                                                                     
+    }
+
     // step 2
-    Thread.sleep(jobInterval);
+    //jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
+    //Thread.sleep(jobInterval);                                                                                                                                                                            
+    Thread.sleep(nextIntArrTime); // nextIntArrTime is in millisec
+
+    // step 2
+    //Thread.sleep(jobInterval);
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -571,7 +606,7 @@ public class GiraphRunner implements Tool {
       processCommand(formatSSSPJobCommand(formatInputPath(i)+".copy.txt", formatOutputPath(i)+"copy", numWorkers));
     }
    }
-
+   br.close();
   }
 
   /**
