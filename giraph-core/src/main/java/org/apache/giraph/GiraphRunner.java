@@ -293,6 +293,19 @@ public class GiraphRunner implements Tool {
     return "start org.apache.giraph.examples.SimpleShortestPathsComputation -vif org.apache.giraph.io.formats.JsonLongDoubleFloatDoubleVertexInputFormat -vip " + inputPath + " -vof org.apache.giraph.io.formats.IdWithValueTextOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
   }
 
+    private String formatPageRankJobCommand(String inputPath, String outputPath, int numWorkers) {
+	return "start org.apache.giraph.examples.SimplePageRankComputation -vif org.apache.giraph.io.formats.JsonLongDoubleFloatDoubleVertexInputFormat -vip " + inputPath + " -vof org.apache.giraph.io.formats.IdWithValueTextOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
+}
+
+    private String formatCCJobCommand(String inputPath, String outputPath, int numWorkers) {
+    return "start org.apache.giraph.examples.ConnectedComponentsComputation -vif org.apache.giraph.examples.IntIntNullIntTextInputFormat -vip " + inputPath + " -vof org.apache.giraph.examples.VertexWithComponentTextOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
+    }
+
+    private String formatKCJobCommand(String inputPath, String outputPath, int numWorkers) {
+    return "start org.apache.giraph.examples.kcore.KCore -mc org.apache.giraph.examples.kcore.KCoreMasterCompute -wc org.apache.giraph.examples.kcore.KCoreWorkerContext -vif org.apache.giraph.examples.kcore.KCoreInputFormat -vip " + inputPath + " -vof org.apache.giraph.examples.kcore.KCoreOutputFormat -op "+ outputPath + " -w " + numWorkers + " -yj giraph-examples-1.1.0-for-hadoop-2.7.0-jar-with-dependencies.jar";
+    }
+  
+
   /*
    *  Fetch the currently running applications using 'yarn application -list'
    */
@@ -424,7 +437,12 @@ public class GiraphRunner implements Tool {
 
    /*
     * list of parameters:
-    * start j w t1 t2
+    * base j w t1 t2 g
+      j = number of jobs
+      w = number of workers per job
+      t1 = inter-arrival time
+      t2 = copy wait time
+      g - number of graph input
     */ 
 
    int jobNumber = Integer.parseInt(args[0]);
@@ -432,6 +450,7 @@ public class GiraphRunner implements Tool {
    //int jobInterval = Integer.parseInt(args[2]) * 1000;
    int jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
    int copyWaiting = Integer.parseInt(args[3]) * 1000;
+   //int graphCount = Integer.parseInt(args[4]);
 
    int numSSHCommands = 1;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
@@ -441,23 +460,36 @@ public class GiraphRunner implements Tool {
    BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
    String nextInterArrivalTime = "";
    int nextIntArrTime = 0;
+   //int nextGraph = 0;
 
    for (int i=0; i<jobNumber; i++) {
-    // step 1 
-    processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
+    // step 1
+       if (i % 5 == 4) {   
+	   processCommand(formatKCJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers * 5));
+       }
+       else {
+	   processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
+       }
+    //nextGraph++;
+    //if (nextGraph == graphCount) {
+    //	nextGraph = 0;
+    //}
     
     // read next inter-arrival time from Yahoo trace
-    if ((nextInterArrivalTime = br.readLine()) != null) {
-	nextIntArrTime = Integer.parseInt(nextInterArrivalTime);
-    }
-    else {
-	nextIntArrTime = 0; // if data missing, just use a default of 0
-    }
+    //if ((nextInterArrivalTime = br.readLine()) != null) {
+    //	nextIntArrTime = Integer.parseInt(nextInterArrivalTime);
+    //}
+    //else {
+    //	nextIntArrTime = 0; // if data missing, just use a default of 0
+    //}
+    //Thread.sleep(nextIntArrTime); // nextIntArrTime is in millisec
     
-    // step 2
-    //Thread.sleep(jobInterval);
-    // jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
-    Thread.sleep(nextIntArrTime); // nextIntArrTime is in millisec
+    // step 2 poisson arrival
+    
+    jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
+    Thread.sleep(jobInterval);
+   
+  
     List<String> waitingJobs = yarnApplicationFetchAccepted();
 
     // step 3 and 4
@@ -510,17 +542,23 @@ public class GiraphRunner implements Tool {
    * 11.  resubmit the job with new input
    */
   private void testScheduling(String[] args) throws Exception {
-
-   /*
-    * list of parameters:
-    * start j w t1 t2
-    */ 
+ 
+      /*                                                                                                                                                                                                       
+       * list of parameters:                                                                                                                                                                                   
+       * test j w t1 t2 g                                                                                                                                                                                      
+      j = number of jobs                                                                                                                                                                                    
+      w = number of workers per job                                                                                                                                                                         
+      t1 = inter-arrival time                                                                                                                                                                               
+      t2 = copy wait time                                                                                                                                                                                   
+      g - number of graph input                                                                                                                                                                             
+      */
 
    int jobNumber = Integer.parseInt(args[0]);
    int numWorkers = Integer.parseInt(args[1]);
    //int jobInterval = Integer.parseInt(args[2]) * 1000;
    int jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000); 
    int copyWaiting = Integer.parseInt(args[3]) * 1000;
+   //int graphCount = Integer.parseInt(args[4]);
 
    int numSSHCommands = 1;
    String issProgressLogPrefix = "/users/mrahman2/iss_progress_giraph_yarn_"; // + applicationId
@@ -530,24 +568,38 @@ public class GiraphRunner implements Tool {
    BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
    String nextInterArrivalTime = "";
    int nextIntArrTime = 0;
-
+   //int nextGraph = 0;
 
    for (int i=0; i<jobNumber; i++) {
-    // step 1 
-    processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
+    // step 1
+       if (i % 5 == 4) {
+           processCommand(formatKCJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers * 5));
+       }
+       else {
+           processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
+       }
+   
+    //processCommand(formatSSSPJobCommand(formatInputPath(i), formatOutputPath(i), numWorkers));
     
+    //nextGraph++;
+    //if (nextGraph == graphCount) {
+    //nextGraph = 0;
+	//}
 
-    if ((nextInterArrivalTime = br.readLine()) != null) {
-        nextIntArrTime = Integer.parseInt(nextInterArrivalTime);
-    }
-    else {
-        nextIntArrTime = 0; // if data missing, just use a default of 0                                                                                                                                     
-    }
+    // yahoo inter-arrival time
+    //if ((nextInterArrivalTime = br.readLine()) != null) {
+    //  nextIntArrTime = Integer.parseInt(nextInterArrivalTime);
+    //}
+    //else {
+    //  nextIntArrTime = 0; // if data missing, just use a default of 0                                                                                                                                     
+    //}
 
-    // step 2
-    //jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
-    //Thread.sleep(jobInterval);                                                                                                                                                                            
-    Thread.sleep(nextIntArrTime); // nextIntArrTime is in millisec
+    //Thread.sleep(nextIntArrTime); // nextIntArrTime is in millisec 
+
+    // step 2 poisson arrival
+    jobInterval = (int)getRandom(new Random(), Integer.parseInt(args[2]) * 1000);
+    Thread.sleep(jobInterval);                                                                                                                                                                            
+   
 
     // step 2
     //Thread.sleep(jobInterval);
